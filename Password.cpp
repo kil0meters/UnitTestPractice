@@ -10,6 +10,8 @@ using std::string;
   'z' and any ASCII characters are allowed.
 */
 int Password::count_leading_characters(const string &phrase){
+  if (phrase.size() == 0) return 0;
+
   int repetition = 1;
   int index = 0;
 
@@ -21,9 +23,17 @@ int Password::count_leading_characters(const string &phrase){
 }
 
 /*
-returns whether the phrase hasb oth at least one upper-case letter and
+returns whether the phrase has both at least one upper-case letter and
 at least one lower-case letter
 */
-bool Password::has_mixed_case(const string &in) {
-    return false;
+bool Password::has_mixed_case(const string &phrase) {
+    bool hasLowercase = false;
+    bool hasUppercase = false;
+
+    for (char c : phrase) {
+        if (c >= 'a' && c <= 'z') hasLowercase = true;
+        if (c >= 'A' && c <= 'Z') hasUppercase = true;
+    }
+
+    return hasLowercase && hasUppercase;
 }
