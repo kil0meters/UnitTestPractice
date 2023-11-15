@@ -1,38 +1,49 @@
 #include "Password.h"
+#include <algorithm>
+#include <iostream>
 #include <string>
 
 using std::string;
 
-/*
-  The function receives a string counts how many times the same character
-  occurs at the beginning of the string, before any other characters (or the
-  end of the string). The function is case-sensitive so 'Z' is different than
-  'z' and any ASCII characters are allowed.
-*/
-int Password::count_leading_characters(const string &phrase){
-  if (phrase.size() == 0) return 0;
+Password::Password() : pass_history({"ChicoCA-95929"}) {}
 
-  int repetition = 1;
-  int index = 0;
-
-  while( index < phrase.length()-1 && phrase[index] == phrase[index+1] ){
-    repetition++;
-    index++;
-  }
-  return repetition;
+void Password::set(const std::string &phrase) {
+    if (phrase.length() >= 8 && has_mixed_case(phrase) &&
+        count_leading_characters(phrase) <= 3 &&
+        std::find(pass_history.begin(), pass_history.end(), phrase) ==
+            pass_history.end()) {
+        pass_history.push_back(phrase);
+    }
 }
 
-/*
-returns whether the phrase has both at least one upper-case letter and
-at least one lower-case letter
-*/
+bool Password::authenticate(const std::string &phrase) {
+    return pass_history.size() != 0 &&
+           pass_history[pass_history.size() - 1] == phrase;
+}
+
+int Password::count_leading_characters(const string &phrase) {
+    if (phrase.size() == 0)
+        return 0;
+
+    int repetition = 1;
+    int index = 0;
+
+    while (index < phrase.length() - 1 && phrase[index] == phrase[index + 1]) {
+        repetition++;
+        index++;
+    }
+    return repetition;
+}
+
 bool Password::has_mixed_case(const string &phrase) {
     bool hasLowercase = false;
     bool hasUppercase = false;
 
     for (char c : phrase) {
-        if (c >= 'a' && c <= 'z') hasLowercase = true;
-        if (c >= 'A' && c <= 'Z') hasUppercase = true;
+        if (c >= 'a' && c <= 'z')
+            hasLowercase = true;
+        if (c >= 'A' && c <= 'Z')
+            hasUppercase = true;
     }
 
     return hasLowercase && hasUppercase;

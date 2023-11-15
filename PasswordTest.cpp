@@ -81,9 +81,61 @@ TEST(HasMixedCaseTest, only_uppercase) {
 TEST(HasMixedCaseTest, simple_mixed_case_start_of_range) {
     Password pwd;
     ASSERT_EQ(pwd.has_mixed_case("aA"), true);
+    ASSERT_EQ(pwd.has_mixed_case("Aa"), true);
 }
 
 TEST(HasMixedCaseTest, simple_mixed_case_end_of_range) {
     Password pwd;
     ASSERT_EQ(pwd.has_mixed_case("zZ"), true);
+    ASSERT_EQ(pwd.has_mixed_case("Zz"), true);
+}
+
+TEST(HasMixedCaseTest, symbols) {
+    Password pwd;
+    ASSERT_EQ(pwd.has_mixed_case("%{"), false);
+}
+
+class AuthenticateTest : public ::testing::Test {
+protected:
+    AuthenticateTest() {}          // constructor runs before each test
+    virtual ~AuthenticateTest() {} // destructor cleans up after tests
+    virtual void SetUp() {}    // sets up before each test (after constructor)
+    virtual void TearDown() {} // clean up after each test, (before destructor)
+};
+
+TEST(AuthenticateTest, password_not_added_length) {
+    Password pwd;
+    pwd.set("Apple");
+    ASSERT_EQ(pwd.authenticate("Apple"), false);
+}
+
+TEST(AuthenticateTest, password_not_added_leading_characters) {
+    Password pwd;
+    pwd.set("aaaaaaaaaaaaA");
+    ASSERT_EQ(pwd.authenticate("aaaaaaaaaaaaA"), false);
+}
+
+TEST(AuthenticateTest, password_not_added_mixed_case) {
+    Password pwd;
+    pwd.set("abcdefghijklmnop");
+    ASSERT_EQ(pwd.authenticate("abcdefghijklmnop"), false);
+}
+
+TEST(AuthenticateTest, password_not_added_in_history) {
+    Password pwd;
+    pwd.set("Abcdefgh");
+    pwd.set("Abcdefg1");
+    pwd.set("Abcdefgh");
+    ASSERT_EQ(pwd.authenticate("Abcdefgh"), false);
+}
+
+TEST(AuthenticateTest, password_default) {
+    Password pwd;
+    ASSERT_EQ(pwd.authenticate("ChicoCA-95929"), true);
+}
+
+TEST(AuthenticateTest, password_added) {
+    Password pwd;
+    pwd.set("Abcdefg1B");
+    ASSERT_EQ(pwd.authenticate("Abcdefg1B"), true);
 }
